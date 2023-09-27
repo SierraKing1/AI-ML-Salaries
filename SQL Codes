@@ -1,0 +1,65 @@
+---Average salary for each experience level
+SELECT experience_level, AVG(salary_in_usd) AS average_salary
+FROM `Salaries.Salaries`
+GROUP BY experience_level
+ORDER BY average_salary DESC;
+
+---The top 10 highest-paying job titles and experience level
+SELECT job_title, experience_level, salary_in_usd
+FROM `Salaries.Salaries`
+ORDER BY experience_level, salary_in_usd DESC
+LIMIT 10;
+
+---The average salary for each country of residence
+SELECT employee_residence, AVG(salary_in_usd) AS average_salary
+FROM `Salaries.Salaries`
+GROUP BY employee_residence
+ORDER BY average_salary DESC;
+
+---The average salary for each company size
+SELECT company_size, AVG(salary_in_usd) AS average_salary
+FROM `Salaries.Salaries`
+GROUP BY company_size
+ORDER BY average_salary DESC;
+
+---The average salary for each remote work ratio
+SELECT remote_ratio, AVG(salary_in_usd) AS average_salary
+FROM `Salaries.Salaries`
+GROUP BY remote_ratio
+ORDER BY average_salary DESC;
+
+---The companies with the highest average salaries for each experience level
+SELECT company_size, experience_level, AVG(salary_in_usd) AS average_salary
+FROM `Salaries.Salaries`
+GROUP BY company_size, experience_level
+ORDER BY experience_level, average_salary DESC
+
+---The countries of residence with the highest average salaries for each experience level
+SELECT employee_residence, experience_level, AVG(salary_in_usd) AS average_salary
+FROM `Salaries.Salaries`
+GROUP BY employee_residence, experience_level
+ORDER BY experience_level, average_salary DESC
+LIMIT 10;
+
+---The companies with the highest percentage of remote workers for each experience level
+SELECT company_size, experience_level, COUNT(*) / SUM(1) AS percentage_remote
+FROM `Salaries.Salaries`
+WHERE remote_ratio >= 50
+GROUP BY company_size, experience_level
+ORDER BY experience_level, percentage_remote DESC
+LIMIT 10;
+
+---The countries of residence with the highest percentage of remote workers for each experience level
+SELECT employee_residence, experience_level, COUNT(*) / SUM(1) AS percentage_remote
+FROM `Salaries.Salaries`
+WHERE remote_ratio >= 50
+GROUP BY employee_residence, experience_level
+ORDER BY experience_level, percentage_remote DESC
+LIMIT 10;
+
+---The companies with the highest salary growth for each experience level
+SELECT company_size, experience_level,
+  (AVG(salary_in_usd) OVER (PARTITION BY company_size, experience_level ORDER BY work_year DESC) - AVG(salary_in_usd) OVER (PARTITION BY company_size, experience_level ORDER BY work_year ASC)) / AVG(salary_in_usd) OVER (PARTITION BY company_size, experience_level ORDER BY work_year ASC) AS salary_growth
+FROM `Salaries.Salaries`
+ORDER BY experience_level, salary_growth DESC
+Limit 100;
